@@ -1,0 +1,180 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: POC Chatbot Kendra
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:3000
+    description: Local Developnent
+  - url: https://gveecfcbg4.execute-api.us-east-1.amazonaws.com/Prod 
+    description: AWS Developnent
+security:
+  - BearerAuth: [ ]
+paths:
+  /auth/login:
+    post:
+      summary: Login de usuario
+      security: [ ]
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '201':
+          description: Login exitoso
+        
+  /auth/refresh:
+    post:
+      summary: Refresh de token
+      security: [ ]
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '201':
+          description: Refresh exitoso
+   
+  /auth/register:
+    post:
+      summary: Registro de usuario
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Refresh exitoso
+
+  /chat/:
+    post:
+      summary: Crear nuevo chat
+      tags:
+        - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChatRequest'
+      responses:
+        '200':
+          description: Chat creado exitosamente
+  /chat/{name}/:
+    parameters:
+      - name: name
+        in: path
+        description: Nombre del chat
+        required: true
+        schema:
+          type: string
+    delete:
+      summary: Eliminar chat
+      tags:
+        - chat
+      responses:
+        '200':
+          description: Chat eliminado exitosamente
+  
+  /message/:
+    post:
+      summary: Guardar nuevo mensaje
+      tags:
+        - message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageSaveRequest'
+      responses:
+        '200':
+          description: Chat creado exitosamente
+  /message/{name}/:
+    parameters:
+      - name: name
+        in: path
+        description: Nombre del chat
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Listar mensajes de un chat actual
+      tags:
+        - message
+      responses:
+        '200':
+          description: Chat eliminado exitosamente
+  
+
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        password:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    CreateChatRequest:
+      type: object
+      properties:
+        name:
+          type: string
+    MessageSaveRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        userMessage:
+          type: string
+        botMessage:
+          type: string
+  responses:
+    SystemError:
+      description: Error del sistema
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                default: false
+              error:
+                type: object
+                description: Solo en modo desarrollo
+                properties:
+                  name:
+                    type: string
+                  message:
+                    type: string
+                  stack:
+                    type: string
+                    description: js callstack for debug
+  securitySchemes:
+    BearerAuth: # Nombre que elijas para el esquema
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

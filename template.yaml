@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Scrappers
+
+Globals:
+  Function:
+    MemorySize: 512
+    Timeout: 29
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        TZ: America/Lima
+
+Resources:
+  RequestHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./dist
+      Runtime: nodejs20.x
+      Handler: api.handler
+    
+      Environment:
+        Variables:
+          APP_NAME: "poc-chatbot-kendra"
+          DATABASE_URL: "postgresql://postgres:poc-ministros-2024@poc-ministros.ccnrq57mco3x.us-east-1.rds.amazonaws.com:5432/postgres?schema=public"
+          PRISMA_CLI_BINARY_TARGETS: "native,rhel-openssl-1.0.x"
+      Events:
+        api:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+Outputs:
+  RequestHandlerApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"

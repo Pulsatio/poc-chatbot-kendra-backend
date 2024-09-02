@@ -1,0 +1,27 @@
+version: "3.0"
+services:
+  postgresdb:
+    image: postgres:15.0
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+
+  api:
+    image: node:20
+    user: "node"
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - ~/.aws:/home/node/.aws
+    command: npm run dev
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+    driver: local
