@@ -1,6 +1,6 @@
 import { HeadObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
-import { CreateBucketCommand, ListObjectsCommand } from '@aws-sdk/client-s3';
+import { CreateBucketCommand, ListObjectsCommand, PutBucketCorsCommand } from '@aws-sdk/client-s3';
 
 export const s3 = new S3Client({
   region: process.env.AWS_REGION ?? 'us-east-1',
@@ -33,7 +33,32 @@ export async function listFiles(bucket: string) {
   if(!ans.Contents){
     return []
   }
-  return ans;
+  return ans.Contents;
+}
+
+export async function setCorsConfiguration(bucket:string) {
+  await s3.send(new PutBucketCorsCommand({
+    Bucket: bucket,
+    CORSConfiguration:{
+      CORSRules:[
+        {
+            "AllowedHeaders": [
+                "*"
+            ],
+            "AllowedMethods": [
+                "GET",
+                "PUT",
+                "POST"
+            ],
+            "AllowedOrigins": [
+                "*"
+            ],
+            "ExposeHeaders": []
+        }
+      ]
+    }
+  })
+)
 }
 
 export async function checkObjectExists(key: string): Promise<boolean> {

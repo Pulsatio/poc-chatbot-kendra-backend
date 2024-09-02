@@ -14,7 +14,7 @@ declare global {
 
 export default async function validateSession(req: Request, res: Response, next: NextFunction) {
   let token = req.headers.authorization;
-  console.log(token);
+ 
   if (!token) {
     return next(new UnauthorizedError('NO_AUTH_TOKEN', 'No se ha enviado el token de autenticación'));
   }

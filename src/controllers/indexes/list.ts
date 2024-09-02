@@ -9,7 +9,15 @@ async function handler(req: Request, res: Response, next: NextFunction) {
   try {
     const user_id = req.session.id;
     const data = await listFiles(user_id);
-    res.json(data);
+    
+    const ans = data.map( file => {
+      return {
+        name: file.Key,
+        created_at: file.LastModified?.toLocaleDateString(),
+        type: "PDF"
+      }
+    } )
+    res.json(ans);
   } catch (error) {
     next(error);
   }
