@@ -1,24 +1,30 @@
 import { NextFunction, Request, Response } from 'express';
 
 import validateSession from "../../middlewares/validate-session";
-import getConnection from '../../databases/postgres';
+import { listFiles } from '../../models/s3-model';
 import { IController } from "../../utils/types";
 
 
 async function handler(req: Request, res: Response, next: NextFunction) {
   try {
-    const db = await getConnection();
     const user_id = req.session.id;
-    const data = await db.indices.findMany({where:{id_usuario:user_id}});
-
-    res.json(data);
+    const data = await listFiles(user_id);
+    
+    const ans = data.map( file => {
+      return {
+        name: file.Key,
+        created_at: file.LastModified?.toLocaleDateString(),
+        type: "PDF"
+      }
+    } )
+    res.json(ans);
   } catch (error) {
     next(error);
   }
 }
 
 const controller: IController = {
-  path: '/indexes/',
+  path: '/indexes/files/',
   method: 'get',
   handler: [
     validateSession,

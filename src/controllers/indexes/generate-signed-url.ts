@@ -20,7 +20,7 @@ async function handler(req: Request, res: Response, next: NextFunction) {
     const filetype = req.query.filetype as string;
 
     const signedPost = await createSignedPost(user_id,filename,filetype);
-    console.log(signedPost.fields)
+   
     return res.json(signedPost);
   } catch (error) {
     next(error);
